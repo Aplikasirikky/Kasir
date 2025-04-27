@@ -78,10 +78,7 @@ function viewDebts(customerName) {
                 <td>${product.name}</td>
                 <td>${product.amount}</td>
                 <td>${formatRupiah(product.total)}</td>
-                <td>
-                <button onclick="payDebt('${customerName}', '${product.name}', ${product.amount}, ${product.total})">Baya</button>
-                <button onclick="removeDebt('${customerName}', '${product.name}')">Hapus</button>
-                </td>
+                <td><button onclick="payDebt('${customerName}', '${product.name}', ${product.amount}, ${product.total})">Bayar</button></td>
             </tr>`;
         });
         content += `</table><p><strong>Total Hutang: Rp ${debtInfo.total}</strong></p>`;
@@ -132,33 +129,6 @@ function addDebt(customerName, productName, amount) {
 
     alert('Hutang berhasil ditambahkan!');
     viewDebts(customerName); // Tampilkan kembali rincian hutang
-}
-
-function removeDebt(customerName, productName) {
-    // Cari index produk dalam daftar hutang
-    const productIndex = debts[customerName].products.findIndex(p => p.name === productName);
-    if (productIndex > -1) {
-        const productDebt = debts[customerName].products[productIndex];
-        
-        /* Kembalikan stok produk
-        const product = products.find(p => p.name === productName);
-        product.stock += productDebt.amount; // Kembalikan stok yang terpakai */
-
-        // Kurangi total hutang
-        debts[customerName].total -= productDebt.total; 
-
-        // Hapus produk dari hutang
-        debts[customerName].products.splice(productIndex, 1);
-
-        // Update penyimpanan lokal
-        localStorage.setItem('debts', JSON.stringify(debts));
-        localStorage.setItem('products', JSON.stringify(products));
-
-        alert('Hutang berhasil dihapus!');
-        viewDebts(customerName); // Tampilkan kembali rincian hutang setelah penghapusan
-    } else {
-        alert('Produk tidak ditemukan dalam hutang.');
-    }
 }
 
 function payDebt(customerName, productName, amount, total) {
