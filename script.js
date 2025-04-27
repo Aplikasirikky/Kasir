@@ -79,7 +79,7 @@ function viewDebts(customerName) {
                 <td>${product.amount}</td>
                 <td>${formatRupiah(product.total)}</td>
                 <td>
-                <button onclick="payDebt('${customerName}', '${product.name}', ${product.amount}, ${product.total})">Bayar</button>
+                <button onclick="payDebt('${customerName}', '${product.name}', ${product.amount}, ${product.total})">Baya</button>
                 <button onclick="removeDebt('${customerName}', '${product.name}')">Hapus</button>
                 </td>
             </tr>`;
