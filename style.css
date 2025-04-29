@@ -38,10 +38,33 @@ button:hover {
     transform: translateY(-2px); /* Efek angkat saat hover */
 }
 
+#login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#login-form input {
+    margin: 10px 0;
+    width: 80%;
+    padding: 12px; /* Padding untuk input */
+}
+
+.alert {
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #3498db;
+    border-radius: 5px;
+    color: #333;
+    background-color: #eaf8ff; /* Warna latar belakang alert yang lebih lembut */
+    display: none; /* Disembunyikan secara default */
+}
+
 #content {
     margin-top: 30px; /* Jarak atas yang lebih besar */
 }
 
+/* Gaya untuk tabel dan elemen lain yang ada di halaman utama */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -96,14 +119,4 @@ input[type="number"] {
     button {
         width: 100%; /* Tombol penuh di perangkat kecil */
     }
-}
-
-.alert {
-    padding: 12px;
-    margin: 10px 0;
-    border: 1px solid #3498db;
-    border-radius: 5px;
-    color: #333;
-    background-color: #eaf8ff; /* Warna latar belakang alert yang lebih lembut */
-    display: none; /* Disembunyikan secara default */
 }
