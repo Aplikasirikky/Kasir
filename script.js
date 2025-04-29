@@ -4,6 +4,31 @@ let profit = JSON.parse(localStorage.getItem('profit')) || {};
 let customers = JSON.parse(localStorage.getItem('customers')) || [];
 let debts = JSON.parse(localStorage.getItem('debts')) || {};
 let detailedDebts = JSON.parse(localStorage.getItem('detailedDebts')) || {};
+let loggedIn = JSON.parse(localStorage.getItem('loggedIn')) || {};
+
+// Contoh username dan password (ini hanya untuk tujuan demonstrasi)
+const validUsername = "admin";
+const validPassword = "rikky";
+
+// Modifikasi di fungsi login untuk menyimpan status login
+function login() {
+    const usernameInput = document.getElementById('username').value;
+    const passwordInput = document.getElementById('password').value;
+    const alertDiv = document.getElementById('login-alert');
+
+    if (usernameInput === validUsername && passwordInput === validPassword) {
+        localStorage.setItem('loggedIn', true); // Simpan status login
+        window.location.href = 'index.html'; // Ganti dengan nama file halaman utama Anda
+    } else {
+        alertDiv.innerText = "Username atau password salah!";
+        alertDiv.style.display = 'block';
+    }
+}
+
+function logout() {
+    localStorage.removeItem('loggedIn'); // Hapus status login
+    window.location.href = 'login.html'; // Redirect ke halaman login
+}
 
 function showCustomers() {
     let content = '<h2>Daftar Pelanggan</h2>';
@@ -514,13 +539,20 @@ function resetProfit() {
 
 // Memuat data dari localStorage saat halaman dimuat
 window.onload = function() {
-    products = JSON.parse(localStorage.getItem('products')) || [];
-    sales = JSON.parse(localStorage.getItem('sales')) || [];
-    profit = JSON.parse(localStorage.getItem('profit')) || {}; // Ambil data keuntungan
-    customers = JSON.parse(localStorage.getItem('customers')) || [];
-    debts = JSON.parse(localStorage.getItem('debts')) || {}; // Memuat data hutang
-    detailedDebts = JSON.parse(localStorage.getItem('detailedDebts')) || {}; // Memuat rincian hutang
-    showMainMenu(); // Tampilkan menu utama saat halaman dimuat
+    const loggedIn = localStorage.getItem('loggedIn');
+
+    if (!loggedIn) {
+        window.location.href = 'login.html'; // Ganti dengan nama file halaman login Anda
+    } else {
+        // Muat data dari localStorage saat halaman dimuat
+        products = JSON.parse(localStorage.getItem('products')) || [];
+        sales = JSON.parse(localStorage.getItem('sales')) || [];
+        profit = JSON.parse(localStorage.getItem('profit')) || {};
+        customers = JSON.parse(localStorage.getItem('customers')) || [];
+        debts = JSON.parse(localStorage.getItem('debts')) || {};
+        detailedDebts = JSON.parse(localStorage.getItem('detailedDebts')) || {};
+        showMainMenu();
+    }
 }
 
 function generateReport() {
