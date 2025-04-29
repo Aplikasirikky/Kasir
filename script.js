@@ -1,6 +1,6 @@
 let products = JSON.parse(localStorage.getItem('products')) || [];
 let sales = JSON.parse(localStorage.getItem('sales')) || [];
-let profit = JSON.parse(localStorage.getItem('profit')) || {}
+let profit = JSON.parse(localStorage.getItem('profit')) || {};
 let customers = JSON.parse(localStorage.getItem('customers')) || [];
 let debts = JSON.parse(localStorage.getItem('debts')) || {};
 let detailedDebts = JSON.parse(localStorage.getItem('detailedDebts')) || {};
@@ -89,6 +89,39 @@ function viewDebts(customerName) {
     document.getElementById('content').innerHTML = content;
 }
 
+// Fungsi untuk menambahkan rincian hutang
+function addDetailedDebt(customerName, productName, amount) {
+    if (!detailedDebts[customerName]) {
+        detailedDebts[customerName] = [];
+    }
+    detailedDebts[customerName].push({ name: productName, amount: amount, total: amount * products.find(p => p.name === productName).sellPrice });
+
+    // Simpan ke localStorage
+    localStorage.setItem('detailedDebts', JSON.stringify(detailedDebts));
+}
+
+// Fungsi untuk menghapus rincian hutang
+function removeDetailedDebt(customerName, productName, amount) {
+    if (detailedDebts[customerName]) {
+        const index = detailedDebts[customerName].findIndex(product => product.name === productName);
+        if (index > -1) {
+            const productDebt = detailedDebts[customerName][index];
+            if (productDebt.amount === amount) {
+                detailedDebts[customerName].splice(index, 1); // Hapus dari rincian jika jumlahnya sama
+            } else {
+                productDebt.amount -= amount; // Kurangi jumlah jika tidak sama
+            }
+            // Jika tidak ada rincian hutang yang tersisa, hapus pelanggan dari detailedDebts
+            if (detailedDebts[customerName].length === 0) {
+                delete detailedDebts[customerName];
+            }
+            // Simpan perubahan ke localStorage
+            localStorage.setItem('detailedDebts', JSON.stringify(detailedDebts));
+        }
+    }
+}
+
+// Fungsi untuk menambahkan hutang
 function addDebt(customerName, productName, amount) {
     const product = products.find(p => p.name === productName);
     
@@ -116,21 +149,18 @@ function addDebt(customerName, productName, amount) {
     // Kurangi stok produk
     product.stock -= amount;
 
-    // Simpan rincian hutang di detailedDebts
-    if (!detailedDebts[customerName]) {
-        detailedDebts[customerName] = [];
-    }
-    detailedDebts[customerName].push({ name: productName, amount: amount, total: amount * product.sellPrice });
-    
+    // Tambahkan rincian hutang
+    addDetailedDebt(customerName, productName, amount);
+
     // Simpan ke localStorage
     localStorage.setItem('debts', JSON.stringify(debts));
-    localStorage.setItem('detailedDebts', JSON.stringify(detailedDebts));
     localStorage.setItem('products', JSON.stringify(products));
 
     alert('Hutang berhasil ditambahkan!');
     viewDebts(customerName); // Tampilkan kembali rincian hutang
 }
 
+// Fungsi untuk membayar hutang
 function payDebt(customerName, productName, amount, total) {
     // Kurangi total hutang dari customer
     debts[customerName].total -= total; 
@@ -149,6 +179,9 @@ function payDebt(customerName, productName, amount, total) {
             productDebt.total -= (total / amount) * amount; // Update total
         }
 
+        // Hapus rincian hutang
+        removeDetailedDebt(customerName, productName, amount);
+
         // Update penyimpanan lokal
         localStorage.setItem('debts', JSON.stringify(debts));
 
@@ -163,6 +196,7 @@ function payDebt(customerName, productName, amount, total) {
         alert('Produk tidak ditemukan dalam hutang.');
     }
 }
+
 // Fungsi untuk menampilkan daftar produk
 function showProducts() {
     sortProducts(); // Panggil fungsi untuk mengurutkan produk sebelum ditampilkan
