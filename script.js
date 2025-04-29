@@ -4,6 +4,70 @@ let profit = JSON.parse(localStorage.getItem('profit')) || {};
 let customers = JSON.parse(localStorage.getItem('customers')) || [];
 let debts = JSON.parse(localStorage.getItem('debts')) || {};
 let detailedDebts = JSON.parse(localStorage.getItem('detailedDebts')) || {};
+let loggedIn = false;
+
+function showLogin() {
+    let content = `<h2>Login</h2>
+        <input id="username" placeholder="Nama Pengguna" />
+        <input id="password" placeholder="Kata Sandi" type="password" />
+        <button onclick="login()">Login</button>
+        <button onclick="registerAdmin()">Daftar Admin</button>`;
+    document.getElementById('content').innerHTML = content;
+}
+
+function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const storedUsername = localStorage.getItem('username') || 'admin';
+    const storedPassword = localStorage.getItem('password') || 'admin123';
+
+    if (username === storedUsername && password === storedPassword) {
+        alert('Login berhasil!');
+        loggedIn = true;
+        document.getElementById('main-menu').style.display = 'block';
+        showMainMenu();
+    } else {
+        alert('Nama pengguna atau kata sandi salah. Silakan coba lagi.');
+    }
+}
+
+function registerAdmin() {
+    const oldUsername = prompt('Masukkan nama pengguna lama:');
+    const oldPassword = prompt('Masukkan kata sandi lama:');
+
+    const storedUsername = localStorage.getItem('username') || 'admin';
+    const storedPassword = localStorage.getItem('password') || 'admin123';
+
+    if (oldUsername === storedUsername && oldPassword === storedPassword) {
+        const newUsername = prompt('Masukkan nama pengguna baru:');
+        const newPassword = prompt('Masukkan kata sandi baru:');
+
+        if (newUsername && newPassword) {
+            localStorage.setItem('username', newUsername);
+            localStorage.setItem('password', newPassword);
+            alert('Pendaftaran berhasil! Silakan login.');
+        } else {
+            alert('Nama pengguna dan kata sandi tidak boleh kosong.');
+        }
+    } else {
+        alert('Nama pengguna atau kata sandi lama salah. Silakan coba lagi.');
+    }
+}
+
+function showMainMenu() {
+    if (!loggedIn) {
+        showLogin();
+        return;
+    }
+    document.getElementById('content').innerHTML = '';
+}
+
+function logout() {
+    loggedIn = false;
+    document.getElementById('main-menu').style.display = 'none';
+    showLogin();
+}
 
 function showCustomers() {
     let content = '<h2>Daftar Pelanggan</h2>';
@@ -520,7 +584,12 @@ window.onload = function() {
     customers = JSON.parse(localStorage.getItem('customers')) || [];
     debts = JSON.parse(localStorage.getItem('debts')) || {}; // Memuat data hutang
     detailedDebts = JSON.parse(localStorage.getItem('detailedDebts')) || {}; // Memuat rincian hutang
-    showMainMenu(); // Tampilkan menu utama saat halaman dimuat
+    localStorage
+    if (!localStorage.getItem('username')) {
+        localStorage.setItem('username', mainAdminUsername);
+        localStorage.setItem('password', mainAdminPassword);
+    }
+    showLogin(); // Tampilkan menu utama saat halaman dimuat
 }
 
 function generateReport() {
