@@ -170,6 +170,10 @@ function payDebt(customerName, productName, amount, total) {
     if (productIndex > -1) {
         const productDebt = debts[customerName].products[productIndex];
         
+        // Cari produk untuk mendapatkan harga jual dan harga beli
+        const product = products.find(p => p.name === productName);
+        const profitAmount = product.sellPrice - product.buyPrice; // Hitung keuntungan
+        
         // Jika jumlah yang dibayar sama dengan jumlah yang dihutang, hapus produk dari hutang
         if (productDebt.amount === amount) {
             debts[customerName].products.splice(productIndex, 1); // Hapus produk dari hutang
@@ -179,17 +183,12 @@ function payDebt(customerName, productName, amount, total) {
             productDebt.total -= (total / amount) * amount; // Update total
         }
 
-        // Hapus rincian hutang
-        removeDetailedDebt(customerName, productName, amount);
+        // Hitung dan simpan keuntungan untuk jumlah yang dibayar
+        calculateProfit(productName, profitAmount * amount); // Hitung keuntungan berdasarkan jumlah yang dibayar
 
         // Update penyimpanan lokal
         localStorage.setItem('debts', JSON.stringify(debts));
 
-        // Hitung keuntungan
-        const product = products.find(p => p.name === productName);
-        const profitAmount = sellPrice - product.buyPrice;
-        calculateProfit(productName, profitAmount); // Hitung keuntungan
-        
         alert('Pembayaran berhasil dilakukan!');
         viewDebts(customerName); // Tampilkan kembali rincian hutang setelah pembayaran
     } else {
