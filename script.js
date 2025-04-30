@@ -187,9 +187,9 @@ function payDebt(customerName, productName, amount, total) {
 
         // Hitung keuntungan
         const product = products.find(p => p.name === productName);
-        const profitAmount = product.sellPrice; // Asumsikan keuntungan adalah harga jual
-        calculateProfit(productName, profitAmount * amount); // Hitung keuntungan berdasarkan jumlah yang dibayar
-
+        const profitAmount = sellPrice - product.buyPrice;
+        calculateProfit(productName, profitAmount); // Hitung keuntungan
+        
         alert('Pembayaran berhasil dilakukan!');
         viewDebts(customerName); // Tampilkan kembali rincian hutang setelah pembayaran
     } else {
