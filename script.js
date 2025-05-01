@@ -4,6 +4,30 @@ let profit = JSON.parse(localStorage.getItem('profit')) || {};
 let customers = JSON.parse(localStorage.getItem('customers')) || [];
 let debts = JSON.parse(localStorage.getItem('debts')) || {};
 let detailedDebts = JSON.parse(localStorage.getItem('detailedDebts')) || {};
+function showProductsMenu() {
+    let content = '<h2>Menu Produk</h2>';
+    content += '<button onclick="showProducts()">Daftar Produk</button>';
+    content += '<button onclick="showAddProduct()">Input Produk</button>';
+    content += '<button onclick="showUpdateProduct()">Update Produk</button>';
+    content += '<button onclick="printProducts()">Cetak Daftar Produk</button>';
+    content += '<button onclick="clearAllProducts()">Hapus Semua Produk</button>';
+    content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
+    document.getElementById('content').innerHTML = content;
+}
+
+function showSalesMenu() {
+    let content = '<h2>Menu Penjualan</h2>';
+    content += '<button onclick="showSales()">Penjualan Produk</button>';
+    content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
+    document.getElementById('content').innerHTML = content;
+}
+
+function showCustomersMenu() {
+    let content = '<h2>Menu Hutang</h2>';
+    content += '<button onclick="showCustomers()">Daftar Pelanggan</button>';
+    content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
+    document.getElementById('content').innerHTML = content;
+}
 
 function showCustomers() {
     let content = '<h2>Daftar Pelanggan</h2>';
