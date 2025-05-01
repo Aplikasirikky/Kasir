@@ -3,7 +3,94 @@ let sales = JSON.parse(localStorage.getItem('sales')) || [];
 let profit = JSON.parse(localStorage.getItem('profit')) || {};
 let customers = JSON.parse(localStorage.getItem('customers')) || [];
 let debts = JSON.parse(localStorage.getItem('debts')) || {};
-let detailedDebts = JSON.parse(localStorage.getItem('detailedDebts')) || {};
+let detailedDebts = JSON.parse(localStorage.getItem('detailedDebts')) || {}
+let users = JSON.parse(localStorage.getItem('users')) || [];
+
+// Fungsi untuk menampilkan menu admin
+function showAdminMenu() {
+    let content = '<h2>Menu Admin</h2>';
+    content += '<button onclick="showUsers()">Daftar Pengguna</button>';
+    content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
+    document.getElementById('content').innerHTML = content;
+}
+
+// Fungsi untuk menampilkan daftar pengguna
+function showUsers() {
+    let content = '<h2>Daftar Pengguna</h2>';
+    content += '<table><tr><th>Username</th><th>Password</th><th>Aksi</th></tr>';
+
+    users.forEach((user, index) => {
+        content += `
+            <tr>
+                <td>${user.username}</td>
+                <td>${user.password}</td>
+                <td>
+                    <button onclick="deleteUser(${index})">Hapus</button>
+                </td>
+            </tr>`;
+    });
+
+    content += '</table>';
+    content += '<input id="newUsername" placeholder="Username Baru" />';
+    content += '<input id="newPassword" placeholder="Password Baru" type="password" />';
+    content += '<button onclick="addUser()">Tambah Pengguna</button>';
+    content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
+
+    document.getElementById('content').innerHTML = content;
+}
+
+// Fungsi untuk menambahkan pengguna
+function addUser() {
+    const newUsername = document.getElementById('newUsername').value;
+    const newPassword = document.getElementById('newPassword').value;
+
+    if (newUsername && newPassword) {
+        users.push({ username: newUsername, password: newPassword });
+        localStorage.setItem('users', JSON.stringify(users)); // Simpan ke localStorage
+        document.getElementById('newUsername').value = ''; // Kosongkan input
+        document.getElementById('newPassword').value = ''; // Kosongkan input
+        showUsers(); // Tampilkan ulang daftar pengguna
+    } else {
+        alert('Silakan masukkan username dan password!');
+    }
+}
+
+// Fungsi untuk menghapus pengguna
+function deleteUser(index) {
+    users.splice(index, 1); // Hapus pengguna dari array
+    localStorage.setItem('users', JSON.stringify(users)); // Simpan perubahan ke localStorage
+    showUsers(); // Tampilkan ulang daftar pengguna
+}
+
+// Modifikasi pada fungsi login untuk memeriksa pengguna di localStorage
+function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    // Periksa jika pengguna adalah admin
+    const validUsername = "admin";
+    const validPassword = "12345";
+
+    if (username === validUsername && password === validPassword) {
+        // Sembunyikan formulir login dan tampilkan menu utama
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('main-menu').style.display = 'block';
+        document.getElementById('admin-menu').style.display = 'block'; // Tampilkan menu admin
+        goToMainMenu(); // Tampilkan menu produk secara default
+    } else {
+        // Periksa apakah pengguna terdaftar
+        const user = users.find(user => user.username === username && user.password === password);
+        if (user) {
+            // Sembunyikan formulir login dan tampilkan menu utama
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'block';
+            goToMainMenu(); // Tampilkan menu produk secara default
+        } else {
+            document.getElementById('error-message').innerText = 'Username atau password salah!';
+        }
+    }
+}
+
 function showProductsMenu() {
     let content = '<h2>Menu Produk</h2>';
     content += '<button onclick="showProducts()">Daftar Produk</button>';
@@ -11,6 +98,13 @@ function showProductsMenu() {
     content += '<button onclick="showUpdateProduct()">Update Produk</button>';
     content += '<button onclick="printProducts()">Cetak Daftar Produk</button>';
     content += '<button onclick="clearAllProducts()">Hapus Semua Produk</button>';
+    content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
+    document.getElementById('content').innerHTML = content;
+}
+
+function showFinancialReportMenu() {
+    let content = '<h2>Menu Laporan Keuangan</h2>';
+    content += '<button onclick="showProfit()">Keuntungan</button>';
     content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
     document.getElementById('content').innerHTML = content;
 }
@@ -25,13 +119,6 @@ function showSalesMenu() {
 function showCustomersMenu() {
     let content = '<h2>Menu Hutang</h2>';
     content += '<button onclick="showCustomers()">Daftar Pelanggan</button>';
-    content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
-    document.getElementById('content').innerHTML = content;
-}
-
-function showFinancialReportMenu() {
-    let content = '<h2>Menu Laporan Keuangan</h2>';
-    content += '<button onclick="showProfit()">Keuntungan</button>';
     content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
     document.getElementById('content').innerHTML = content;
 }
