@@ -8,6 +8,14 @@ let users = JSON.parse(localStorage.getItem('users')) || [];
 let cash = JSON.parse(localStorage.getItem('cash')) || 0; // Inisialisasi kas dari localStorage
 let expenses = JSON.parse(localStorage.getItem('expenses')) || []; // Inisialisasi pengeluaran dari localStorage
 
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0'); // Menambahkan 0 di depan jika kurang dari 10
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`; // Format tgl/bulan/tahun
+}
+
 function showExpensesMenu() {
     let content = '<h2>Menu Pengeluaran</h2>';
     content += '<table><tr><th>Tanggal</th><th>Jumlah</th><th>Deskripsi</th><th>Aksi</th></tr>';
@@ -41,7 +49,8 @@ function addExpense() {
     const description = document.getElementById('expenseDescription').value;
 
     if (!isNaN(amount) && amount > 0 && date && description) {
-        expenses.push({ date, amount, description }); // Tambah deskripsi ke pengeluaran
+        const formattedDate = formatDate(date); // Format tanggal di sini
+        expenses.push({ date: formattedDate, amount, description }); // Menyimpan tanggal yang terformat
         cash -= amount; // Kurangi kas
         localStorage.setItem('cash', cash); // Update kas di localStorage
         localStorage.setItem('expenses', JSON.stringify(expenses)); // Simpan pengeluaran ke localStorage
@@ -259,14 +268,16 @@ function viewDebts(customerName) {
 
     content += `</select>
         <input type="number" id="debtAmount" placeholder="Jumlah Hutang" min="1" />
-        <button onclick="addDebt('${customerName}', document.getElementById('productSelect').value, parseInt(document.getElementById('debtAmount').value))">Tambah Hutang</button>
+        <input type="date" id="debtDate" />
+        <button onclick="addDebt('${customerName}', document.getElementById('productSelect').value, parseInt(document.getElementById('debtAmount').value), document.getElementById('debtDate').value)">Tambah Hutang</button>
         <button onclick="showCustomers()">Kembali ke Daftar Pelanggan</button>`;
 
     // Tampilkan rincian hutang jika ada
     if (detailInfo.length > 0) {
-        content += '<table><tr><th>Produk</th><th>Jumlah</th><th>Total Hutang</th></tr>';
+        content += '<table><tr><th>Tanggal</th><th>Produk</th><th>Jumlah</th><th>Total Hutang</th><th>Aksi</th></tr>';
         detailInfo.forEach(product => {
             content += `<tr>
+                <td>${product.date}</td>
                 <td>${product.name}</td>
                 <td>${product.amount}</td>
                 <td>${formatRupiah(product.total)}</td>
@@ -282,11 +293,16 @@ function viewDebts(customerName) {
 }
 
 // Fungsi untuk menambahkan rincian hutang
-function addDetailedDebt(customerName, productName, amount) {
+function addDetailedDebt(customerName, productName, amount, date) {
     if (!detailedDebts[customerName]) {
         detailedDebts[customerName] = [];
     }
-    detailedDebts[customerName].push({ name: productName, amount: amount, total: amount * products.find(p => p.name === productName).sellPrice });
+    detailedDebts[customerName].push({ 
+        name: productName, 
+        amount: amount, 
+        total: amount * products.find(p => p.name === productName).sellPrice,
+        date: date // Menyimpan tanggal di sini
+    });
 
     // Simpan ke localStorage
     localStorage.setItem('detailedDebts', JSON.stringify(detailedDebts));
@@ -314,7 +330,7 @@ function removeDetailedDebt(customerName, productName, amount) {
 }
 
 // Fungsi untuk menambahkan hutang
-function addDebt(customerName, productName, amount) {
+function addDebt(customerName, productName, amount, date) {
     const product = products.find(p => p.name === productName);
     
     if (!product || amount <= 0 || amount > product.stock) {
@@ -341,8 +357,9 @@ function addDebt(customerName, productName, amount) {
     // Kurangi stok produk
     product.stock -= amount;
 
-    // Tambahkan rincian hutang
-    addDetailedDebt(customerName, productName, amount);
+    // Format tanggal dan tambahkan rincian hutang
+    const formattedDate = formatDate(date); // Format tanggal di sini
+    addDetailedDebt(customerName, productName, amount, formattedDate); // Menggunakan tanggal yang terformat
 
     // Simpan ke localStorage
     localStorage.setItem('debts', JSON.stringify(debts));
@@ -377,7 +394,6 @@ function payDebt(customerName, productName, amount, total) {
 
         // Hitung dan simpan keuntungan untuk jumlah yang dibayar
         calculateProfit(productName, profitAmount * amount); // Hitung keuntungan berdasarkan jumlah yang dibayar
-
         // Tambahkan pembayaran ke kas
         cash += total; // Menambah kas dengan total yang dibayar
         localStorage.setItem('cash', cash); // Simpan kas ke localStorage
