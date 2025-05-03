@@ -5,6 +5,77 @@ let customers = JSON.parse(localStorage.getItem('customers')) || [];
 let debts = JSON.parse(localStorage.getItem('debts')) || {};
 let detailedDebts = JSON.parse(localStorage.getItem('detailedDebts')) || {}
 let users = JSON.parse(localStorage.getItem('users')) || [];
+let cash = JSON.parse(localStorage.getItem('cash')) || 0; // Inisialisasi kas dari localStorage
+let expenses = JSON.parse(localStorage.getItem('expenses')) || []; // Inisialisasi pengeluaran dari localStorage
+
+function showExpensesMenu() {
+    let content = '<h2>Menu Pengeluaran</h2>';
+    content += '<table><tr><th>Tanggal</th><th>Jumlah</th><th>Deskripsi</th><th>Aksi</th></tr>';
+
+    expenses.forEach((expense, index) => {
+        content += `
+            <tr>
+                <td>${expense.date}</td>
+                <td>${formatRupiah(expense.amount)}</td>
+                <td>${expense.description}</td>
+                <td>
+                    <button onclick="deleteExpense(${index})">Hapus</button>
+                </td>
+            </tr>`;
+    });
+
+    content += '</table>';
+    content += '<input id="expenseDate" type="date" placeholder="Tanggal" />';
+    content += '<input id="expenseAmount" placeholder="Jumlah Pengeluaran" type="number" />';
+    content += '<input id="expenseDescription" placeholder="Deskripsi Pengeluaran" />';
+    content += '<button onclick="addExpense()">Tambah Pengeluaran</button>';
+    content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
+
+    document.getElementById('content').innerHTML = content;
+}
+
+// Fungsi untuk menambahkan pengeluaran
+function addExpense() {
+    const amount = parseFloat(document.getElementById('expenseAmount').value);
+    const date = document.getElementById('expenseDate').value;
+    const description = document.getElementById('expenseDescription').value;
+
+    if (!isNaN(amount) && amount > 0 && date && description) {
+        expenses.push({ date, amount, description }); // Tambah deskripsi ke pengeluaran
+        cash -= amount; // Kurangi kas
+        localStorage.setItem('cash', cash); // Update kas di localStorage
+        localStorage.setItem('expenses', JSON.stringify(expenses)); // Simpan pengeluaran ke localStorage
+        
+        alert('Pengeluaran berhasil ditambahkan!');
+        showExpensesMenu(); // Tampilkan kembali menu pengeluaran setelah penambahan
+    } else {
+        alert('Silakan masukkan jumlah, tanggal, dan deskripsi pengeluaran yang valid!');
+    }
+}
+
+// Fungsi untuk menghapus pengeluaran
+function deleteExpense(index) {
+    const removedExpense = expenses[index];
+    expenses.splice(index, 1); // Hapus pengeluaran dari array
+    cash += removedExpense.amount; // Kembalikan jumlah ke kas
+    localStorage.setItem('cash', cash); // Update kas di localStorage
+    localStorage.setItem('expenses', JSON.stringify(expenses)); // Simpan perubahan ke localStorage
+    
+    alert('Pengeluaran berhasil dihapus!');
+    showExpensesMenu(); // Tampilkan kembali menu pengeluaran setelah penghapusan
+}
+
+function setCash() {
+    const newCash = parseFloat(document.getElementById('cashInput').value);
+    if (!isNaN(newCash) && newCash >= 0) {
+        cash = newCash;
+        localStorage.setItem('cash', cash); // Simpan kas ke localStorage
+        alert('Kas berhasil diperbarui!');
+        showFinancialReport(); // Tampilkan laporan keuangan setelah mengupdate kas
+    } else {
+        alert('Silakan masukkan jumlah kas yang valid!');
+    }
+}
 
 // Fungsi untuk menampilkan menu admin
 function showAdminMenu() {
@@ -104,6 +175,9 @@ function showProductsMenu() {
 
 function showFinancialReportMenu() {
     let content = '<h2>Menu Laporan Keuangan</h2>';
+    content += `<p><strong>Jumlah Kas Saat Ini:</strong> ${formatRupiah(cash)}</p>`;
+    content += '<input id="cashInput" placeholder="Input Kas" type="number" />';
+    content += '<button onclick="setCash()">Set Kas</button>';
     content += '<button onclick="showProfit()">Keuntungan</button>';
     content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
     document.getElementById('content').innerHTML = content;
@@ -582,11 +656,14 @@ function recordSale(productName, sellPrice, stock) {
     const product = products.find(p => p.name === productName);
     if (product && product.stock > 0) {
         sales.push({ productName, sellPrice });
-        
+
         const profitAmount = sellPrice - product.buyPrice;
         calculateProfit(productName, profitAmount); // Hitung keuntungan
         
         product.stock -= 1; 
+        cash += sellPrice; // Tambahkan hasil penjualan ke kas
+        localStorage.setItem('cash', cash); // Simpan kas ke localStorage
+        
         localStorage.setItem('products', JSON.stringify(products)); 
         alert('Penjualan berhasil dicatat!');
     } else {
