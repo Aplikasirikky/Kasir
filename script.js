@@ -378,6 +378,10 @@ function payDebt(customerName, productName, amount, total) {
         // Hitung dan simpan keuntungan untuk jumlah yang dibayar
         calculateProfit(productName, profitAmount * amount); // Hitung keuntungan berdasarkan jumlah yang dibayar
 
+        // Tambahkan pembayaran ke kas
+        cash += total; // Menambah kas dengan total yang dibayar
+        localStorage.setItem('cash', cash); // Simpan kas ke localStorage
+
         // Hapus rincian hutang
         removeDetailedDebt(customerName, productName, amount);
 
