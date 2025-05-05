@@ -192,13 +192,6 @@ function showFinancialReportMenu() {
     document.getElementById('content').innerHTML = content;
 }
 
-function showSalesMenu() {
-    let content = '<h2>Menu Penjualan</h2>';
-    content += '<button onclick="showSales()">Penjualan Produk</button>';
-    content += '<button onclick="goToMainMenu()">Kembali ke Menu Utama</button>';
-    document.getElementById('content').innerHTML = content;
-}
-
 function showCustomersMenu() {
     let content = '<h2>Menu Hutang</h2>';
     content += '<button onclick="showCustomers()">Daftar Pelanggan</button>';
