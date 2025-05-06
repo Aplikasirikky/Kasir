@@ -8,7 +8,6 @@ let users = JSON.parse(localStorage.getItem('users')) || [];
 let cash = JSON.parse(localStorage.getItem('cash')) || 0; // Inisialisasi kas dari localStorage
 let expenses = JSON.parse(localStorage.getItem('expenses')) || []; // Inisialisasi pengeluaran dari localStorage
 let dailySales = JSON.parse(localStorage.getItem('dailySales')) || {}; // Inisialisasi data penjualan harian dari localStorage
-let dailyCash = JSON.parse(localStorage.getItem('dailyCash')) || {};
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -81,11 +80,6 @@ function setCash() {
     if (!isNaN(newCash) && newCash >= 0) {
         cash = newCash;
         localStorage.setItem('cash', cash); // Simpan kas ke localStorage
-
-        // Simpan kas ke dailyCash dengan tanggal hari ini
-        const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
-        dailyCash[today] = cash;
-        localStorage.setItem('dailyCash', JSON.stringify(dailyCash)); // Update dailyCash
 
         alert('Kas berhasil diperbarui!');
         showFinancialReport(); // Tampilkan laporan keuangan setelah mengupdate kas
@@ -193,15 +187,7 @@ function showProductsMenu() {
 function showFinancialReportMenu() {
     let content = '<h2>Menu Laporan Keuangan</h2>';
     content += `<p><strong>Jumlah Kas Saat Ini:</strong> ${formatRupiah(cash)}</p>`;
-    // Mendapatkan tanggal kemarin
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1); // Mengurangi satu hari
-    const yesterdayString = yesterday.toISOString().split('T')[0]; // Format YYYY-MM-DD
-
-    // Mendapatkan kas kemarin
-    const yesterdayCash = dailyCash[yesterdayString] || 0;
-
-    content += `<p><strong>Jumlah Kas Kemarin:</strong> ${formatRupiah(yesterdayCash)}</p>`;
+    
     content += '<input id="cashInput" placeholder="Input Kas" type="number" />';
     content += '<button onclick="setCash()">Set Kas</button>';
     content += '<button onclick="showProfit()">Keuntungan</button>';
