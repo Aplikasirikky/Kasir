@@ -242,7 +242,6 @@ function addExpense() {
 function deleteExpense(index) {
     const removedExpense = expenses[index];
     expenses.splice(index, 1); // Hapus pengeluaran dari array
-    
     localStorage.setItem('expenses', JSON.stringify(expenses)); // Simpan perubahan ke localStorage
     
     alert('Pengeluaran berhasil dihapus!');
@@ -332,6 +331,9 @@ function login() {
         document.getElementById('login-form').style.display = 'none';
         document.getElementById('main-menu').style.display = 'block';
         document.getElementById('admin-menu').style.display = 'block'; // Tampilkan menu admin
+        document.getElementById('resetAllData-menu').style.display = 'block'; // Tampilkan menu admin
+        document.getElementById('downloadAllData-menu').style.display = 'block'; // Tampilkan menu admin
+        document.getElementById('uploadAllData-menu').style.display = 'block'; // Tampilkan menu admin
         goToMainMenu(); // Tampilkan menu produk secara default
     } else {
         // Periksa apakah pengguna terdaftar
