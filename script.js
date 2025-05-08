@@ -242,8 +242,7 @@ function addExpense() {
 function deleteExpense(index) {
     const removedExpense = expenses[index];
     expenses.splice(index, 1); // Hapus pengeluaran dari array
-    cash += removedExpense.amount; // Kembalikan jumlah ke kas
-    localStorage.setItem('cash', cash); // Update kas di localStorage
+    
     localStorage.setItem('expenses', JSON.stringify(expenses)); // Simpan perubahan ke localStorage
     
     alert('Pengeluaran berhasil dihapus!');
