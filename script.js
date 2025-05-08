@@ -11,32 +11,39 @@ let dailySales = JSON.parse(localStorage.getItem('dailySales')) || {}; // Inisia
 
 function downloadAllData() {
     let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Tipe Data,Nama Produk,Harga Beli,Harga Jual,Stok,Jumlah Penjualan,Total Hutang,Nama Pelanggan,Hutang\n";
+    csvContent += "Tipe Data,Nama Produk,Harga Beli,Harga Jual,Stok,Jumlah Penjualan,Total Hutang,Nama Pelanggan,Hutang,Tanggal,Deskripsi\n";
 
     // Data Produk
     products.forEach(product => {
         const salesCount = sales.filter(sale => sale.productName === product.name).length;
-        csvContent += `Produk,${product.name},${product.buyPrice},${product.sellPrice},${product.stock},${salesCount},,\n`;
+        csvContent += `Produk,${product.name},${product.buyPrice},${product.sellPrice},${product.stock},${salesCount},,,,\n`;
     });
 
     // Data Hutang
     for (const customer in debts) {
         const totalDebt = debts[customer].total;
-        csvContent += `Hutang,, , , , ,${customer},${totalDebt}\n`;
+        csvContent += `Hutang,, , , , ,${customer},${totalDebt},,\n`;
+
+        // Tambahkan rincian dari detailedDebts
+        if (detailedDebts[customer]) {
+            detailedDebts[customer].forEach(debtDetail => {
+                csvContent += `Rincian Hutang,, , , , ,${customer},${debtDetail.total},${debtDetail.name},${debtDetail.amount},${debtDetail.date}\n`;
+            });
+        }
     }
 
     // Data Pengeluaran
     expenses.forEach(expense => {
-        csvContent += `Pengeluaran,, , , , , ,${expense.description},${expense.amount}\n`;
+        csvContent += `Pengeluaran,, , , , , ,${expense.description},${expense.amount},,\n`;
     });
 
     // Data Keuntungan
     for (const productName in profit) {
-        csvContent += `Keuntungan,, , , , ,${productName},${profit[productName]}\n`;
+        csvContent += `Keuntungan,, , , , ,${productName},${profit[productName]},,\n`;
     }
 
     // Data Kas
-    csvContent += `Kas,, , , , ,Total Kas,${cash}\n`;
+    csvContent += `Kas,, , , , ,Total Kas,${cash},,\n`;
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
