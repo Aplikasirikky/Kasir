@@ -64,6 +64,12 @@ function uploadAllData() {
                             detailedDebts[customerName] = [];
                         }
                         detailedDebts[customerName].push(debtDetail);
+
+                        // Juga tambahkan ke hutang
+                        if (debts[customerName]) {
+                            debts[customerName].total += debtDetail.total; // Update total hutang
+                            debts[customerName].products.push({ name: debtDetail.name, amount: debtDetail.amount, total: debtDetail.total });
+                        }
                     }
                     // Mengisi data pengeluaran
                     else if (type === "Pengeluaran") {
