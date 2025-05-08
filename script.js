@@ -47,18 +47,23 @@ function uploadAllData() {
                     }
                     // Mengisi data hutang
                     else if (type === "Hutang") {
-                        const customerName = data[6];
+                        const customerName = data[6].trim();
                         const totalDebt = parseFloat(data[7]);
-                        debts[customerName] = { total: totalDebt, products: [] };
+                        if (customerName) {
+                            debts[customerName] = { total: totalDebt, products: [] };
+                            if (!customers.includes(customerName)) {
+                                customers.push(customerName); // Tambahkan pelanggan
+                            }
+                        }
                     }
                     // Mengisi rincian hutang
                     else if (type === "Rincian Hutang") {
-                        const customerName = data[6];
+                        const customerName = data[6].trim();
                         const debtDetail = {
                             name: data[8],
                             amount: parseInt(data[9]),
                             total: parseFloat(data[7]),
-                            date: data[10]
+                            date: data[10] ? data[10].trim() : null // Ambil tanggal dari kolom data[10] jika ada
                         };
                         if (!detailedDebts[customerName]) {
                             detailedDebts[customerName] = [];
@@ -74,16 +79,19 @@ function uploadAllData() {
                     // Mengisi data pengeluaran
                     else if (type === "Pengeluaran") {
                         const expense = {
-                            description: data[7],
-                            amount: parseFloat(data[8])
+                            description: data[7] || '', // Set default description jika kosong
+                            amount: parseFloat(data[8]),
+                            date: data[9] ? data[9].trim() : null // Ambil tanggal dari kolom data[9] jika ada
                         };
                         expenses.push(expense);
                     }
                     // Mengisi data keuntungan
                     else if (type === "Keuntungan") {
-                        const productName = data[6];
+                        const productName = data[6].trim();
                         const profitAmount = parseFloat(data[7]);
-                        profit[productName] = profitAmount;
+                        if (productName) {
+                            profit[productName] = profitAmount;
+                        }
                     }
                     // Mengisi data kas
                     else if (type === "Kas") {
@@ -96,7 +104,7 @@ function uploadAllData() {
             localStorage.setItem('products', JSON.stringify(products));
             localStorage.setItem('sales', JSON.stringify(sales));
             localStorage.setItem('profit', JSON.stringify(profit));
-            localStorage.setItem('customers', JSON.stringify(customers));
+            localStorage.setItem('customers', JSON.stringify(customers)); // Simpan customers
             localStorage.setItem('debts', JSON.stringify(debts));
             localStorage.setItem('detailedDebts', JSON.stringify(detailedDebts));
             localStorage.setItem('expenses', JSON.stringify(expenses));
