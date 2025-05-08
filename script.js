@@ -50,7 +50,7 @@ function uploadAllData() {
                         const customerName = data[6].trim();
                         const totalDebt = parseFloat(data[7]);
                         if (customerName) {
-                            debts[customerName] = { total: totalDebt, products: [] };
+                            debts[customerName] = { total: totalDebt, products: [] }; // Inisialisasi hutang pelanggan
                             if (!customers.includes(customerName)) {
                                 customers.push(customerName); // Tambahkan pelanggan
                             }
