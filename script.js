@@ -9,6 +9,103 @@ let cash = JSON.parse(localStorage.getItem('cash')) || 0; // Inisialisasi kas da
 let expenses = JSON.parse(localStorage.getItem('expenses')) || []; // Inisialisasi pengeluaran dari localStorage
 let dailySales = JSON.parse(localStorage.getItem('dailySales')) || {}; // Inisialisasi data penjualan harian dari localStorage
 
+function uploadAllData() {
+    const fileInput = document.getElementById('fileInputAll');
+    const file = fileInput.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+            const contents = event.target.result;
+            const rows = contents.split("\n").slice(1); // Mengabaikan header
+
+            // Reset data sebelum mengunggah
+            products = [];
+            sales = [];
+            profit = {};
+            customers = [];
+            debts = {};
+            detailedDebts = {};
+            expenses = [];
+
+            rows.forEach(row => {
+                const data = row.split(",");
+
+                if (data.length > 0) {
+                    const type = data[0].trim();
+
+                    // Mengisi data produk
+                    if (type === "Produk") {
+                        const product = {
+                            name: data[1],
+                            buyPrice: parseFloat(data[2]),
+                            sellPrice: parseFloat(data[3]),
+                            stock: parseInt(data[4])
+                        };
+                        products.push(product);
+                    }
+                    // Mengisi data hutang
+                    else if (type === "Hutang") {
+                        const customerName = data[6];
+                        const totalDebt = parseFloat(data[7]);
+                        debts[customerName] = { total: totalDebt, products: [] };
+                    }
+                    // Mengisi rincian hutang
+                    else if (type === "Rincian Hutang") {
+                        const customerName = data[6];
+                        const debtDetail = {
+                            name: data[8],
+                            amount: parseInt(data[9]),
+                            total: parseFloat(data[7]),
+                            date: data[10]
+                        };
+                        if (!detailedDebts[customerName]) {
+                            detailedDebts[customerName] = [];
+                        }
+                        detailedDebts[customerName].push(debtDetail);
+                    }
+                    // Mengisi data pengeluaran
+                    else if (type === "Pengeluaran") {
+                        const expense = {
+                            description: data[7],
+                            amount: parseFloat(data[8])
+                        };
+                        expenses.push(expense);
+                    }
+                    // Mengisi data keuntungan
+                    else if (type === "Keuntungan") {
+                        const productName = data[6];
+                        const profitAmount = parseFloat(data[7]);
+                        profit[productName] = profitAmount;
+                    }
+                    // Mengisi data kas
+                    else if (type === "Kas") {
+                        cash = parseFloat(data[7]);
+                    }
+                }
+            });
+
+            // Simpan ke localStorage
+            localStorage.setItem('products', JSON.stringify(products));
+            localStorage.setItem('sales', JSON.stringify(sales));
+            localStorage.setItem('profit', JSON.stringify(profit));
+            localStorage.setItem('customers', JSON.stringify(customers));
+            localStorage.setItem('debts', JSON.stringify(debts));
+            localStorage.setItem('detailedDebts', JSON.stringify(detailedDebts));
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            localStorage.setItem('cash', cash);
+
+            alert("Data berhasil diunggah!");
+            showMainMenu(); // Tampilkan menu utama setelah mengunggah data
+        };
+
+        reader.readAsText(file);
+    } else {
+        alert("Silakan pilih file untuk diunggah.");
+    }
+}
+
 function downloadAllData() {
     let csvContent = "data:text/csv;charset=utf-8,";
     csvContent += "Tipe Data,Nama Produk,Harga Beli,Harga Jual,Stok,Jumlah Penjualan,Total Hutang,Nama Pelanggan,Hutang,Tanggal,Deskripsi\n";
